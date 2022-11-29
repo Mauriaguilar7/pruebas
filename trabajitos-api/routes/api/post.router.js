@@ -12,6 +12,7 @@ const { authentication, authorization } = require("../../middlewares/auth.middew
 
 router.get("/", postController.findAll);
 router.get("/own", authentication, postController.findOwn);
+
 router.get("/user/:identifier",
     postValidators.findByIdValidator,
     runValidations,
@@ -21,16 +22,24 @@ router.get("/user/:identifier",
 router.get("/:identifier",
     postValidators.findByIdValidator,
     runValidations,
-    postController.findOneById);
+    postController.findOneById
+);
 
 //Funcionalidad de usuario 
     router.post("/",
-    authentication,
+    authentication, 
     authorization(ROLES.USER),
     postValidators.createPostValidator,
     runValidations,
-    postController.create);
+    postController.create
+);
+
+/*     router.patch("/visibility/:identifier",
+    authentication,
+    authorization(ROLES.USER),
+    postValidators.findPostByIdValidator,
+    runValidations,
+    postController.togglePostVisibility
+); */
 
 module.exports = router;
-
-

@@ -28,6 +28,9 @@ validators.createPostValidator = [
         .optional()
         .notEmpty().withMessage("Debes de colocar una imagen")
         .isURL().withMessage("La imagen debe ser una URL"),
+    body("category")
+        .optional()
+        .notEmpty().withMessage("Debes de colocar una categoria")
 
 ];
 

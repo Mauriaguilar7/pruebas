@@ -42,8 +42,13 @@ const PostSchema = new Schema({
         required: true
     },
     category: {
-        type: String
-    },
+        type: String,
+        required : true
+    }, 
+    comments: {
+        type: String,
+        required : false
+    }, 
     hidden: {
         type: Boolean,
         default: false

@@ -7,75 +7,87 @@ const { createToken, verifyToken } = require("../utils/jwt.tools");
 const controller = {};
 
 controller.register = async (req,res) => {
-    try {
-    // Paso 01: Obtener datos del usuario
-    const { username , email, password} = req.body;
+  try {
+  // Paso 01: Obtener datos del usuario
+  const { username , email, password} = req.body;
 
-    // Paso 02: Verificar el username o el email esten libres
+  // Paso 02: Verificar el username o el email esten libres
 
-    const user = await User.findOne({ $or: [{username : username}, {email : email}] });
-    
-    if(user){
-        return res.status(409).json({ error: "Este usuario ya existe"});
-    }
+  const user = await User.findOne({ $or: [{username : username}, {email : email}] });
+  
+  if(user){
+      return res.status(409).json({ error: "Este usuario ya existe"});
+  }
 
-    //debug ({ username , email, password})
+  //debug ({ username , email, password})
 
-    // Paso 03: Encirptar? 
-    
-    // Paso 04: Guardar usuario 
+  // Paso 03: Encirptar? 
+  
+  // Paso 04: Guardar usuario 
 
-    const newUser = new User ({
-        username: username,
-        email: email,
-        password: password,
-        roles: [ROLES.USER]
-    })
+  const newUser = new User ({
+      username: username,
+      email: email,
+      password: password,
+      roles: [ROLES.USER]
+  })
 
-    await newUser.save();
+  await newUser.save();
 
-    return res.status(201).json ({ message: "Usuario guardado con exito!"})
+  return res.status(201).json ({ message: "Usuario guardado con exito!"})
 
-    } catch (error) {
-        debug({ error });
-        return res.status(500).json({ message: "Error inseperado"})
-        
-    }
+  } catch (error) {
+      debug({ error });
+      return res.status(500).json({ message: "Error inseperado"})
+      
+  }
 }
 
 controller.login = async(req,res) => {
-    try {
-        const {identifier, password} = req.body;
-        //Paso 01: verficar si el usuario existe 
-        const user = await User.findOne({ $or: [{username: identifier}, {email: identifier}]});
+  try {
+      const {identifier, password} = req.body;
+      //Paso 01: verficar si el usuario existe 
+      const user = await User.findOne({ $or: [{username: identifier}, {email: identifier}]});
 
-        if (!user) {
-            return res.status(404).json ({error: "El usuario no existe"});
-        }
+      if (!user) {
+          return res.status(404).json ({error: "El usuario no existe"});
+      }
 
-    
-        //Paso 02: verificar contraseñas
-        if (!user.comparePassword(password)) {
-            return res.status(401).json({error: "Contraseña no coincide"});
-        }
-
-
-        //Paso 03: exitoso o no 
-        const token = createToken(user._id);
+  
+      //Paso 02: verificar contraseñas
+      if (!user.comparePassword(password)) {
+          return res.status(401).json({error: "Contraseña no coincide"});
+      }
 
 
-        user.tokens = [token, ...user.tokens.filter(_token => verifyToken(_token)).splice(0,4)];
-        await user.save();
-
-        //Paso 04: Registrar los token
+      //Paso 03: exitoso o no 
+      const token = createToken(user._id);
 
 
-        return res.status(200).json({token : token});
+      user.tokens = [token, ...user.tokens.filter(_token => verifyToken(_token)).splice(0,4)];
+      await user.save();
 
-    } catch (error) {
-        debug (error);
-        return res.status(500).json({ message: "Error inseperado"})
-    }
+      //Paso 04: Registrar los token
+
+
+      return res.status(200).json({token : token});
+
+  } catch (error) {
+      debug (error);
+      return res.status(500).json({ message: "Error inseperado"})
+  }
 } ;
+
+controller.whoami = async (req, res) => {
+  try {
+    const { _id, username, email, roles } = req.user;
+    return res.status(200).json({ _id, username, email, roles });
+  } catch (error) {
+    debug(error);
+    return res.status(500).json({ error: "Error inesperado" })
+  }
+}
+
+
 
 module.exports = controller;

@@ -8,9 +8,14 @@ const router = express.Router();
  const authRouter = require ("./auth.router");
 
 
+// const contactRouter = require ("./contact.router");
+
+
 //definir las rutas
 router.use("/auth", authRouter);
 router.use("/post", postRouter);
+
+//router.use("/contact", contactRouter); 
 
 
 
